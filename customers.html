@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartBiz - Customer Management</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#f59e0b'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+overflow-x: hidden;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+.custom-scrollbar::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+background: #f1f1f1;
+border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+background: #d1d5db;
+border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+background: #9ca3af;
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 40px;
+height: 20px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+transition: .4s;
+border-radius: 20px;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 16px;
+width: 16px;
+left: 2px;
+bottom: 2px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .slider {
+background-color: #4f46e5;
+}
+input:checked + .slider:before {
+transform: translateX(20px);
+}
+.custom-checkbox {
+position: relative;
+display: inline-block;
+width: 18px;
+height: 18px;
+}
+.custom-checkbox input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.checkmark {
+position: absolute;
+top: 0;
+left: 0;
+height: 18px;
+width: 18px;
+background-color: #fff;
+border: 1px solid #d1d5db;
+border-radius: 4px;
+}
+.custom-checkbox input:checked ~ .checkmark {
+background-color: #4f46e5;
+border-color: #4f46e5;
+}
+.checkmark:after {
+content: "";
+position: absolute;
+display: none;
+}
+.custom-checkbox input:checked ~ .checkmark:after {
+display: block;
+}
+.custom-checkbox .checkmark:after {
+left: 6px;
+top: 2px;
+width: 5px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-radio {
+position: relative;
+display: inline-block;
+width: 18px;
+height: 18px;
+}
+.custom-radio input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.radiomark {
+position: absolute;
+top: 0;
+left: 0;
+height: 18px;
+width: 18px;
+background-color: #fff;
+border: 1px solid #d1d5db;
+border-radius: 50%;
+}
+.custom-radio input:checked ~ .radiomark {
+border-color: #4f46e5;
+}
+.radiomark:after {
+content: "";
+position: absolute;
+display: none;
+}
+.custom-radio input:checked ~ .radiomark:after {
+display: block;
+}
+.custom-radio .radiomark:after {
+top: 4px;
+left: 4px;
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #4f46e5;
+}
+.custom-range {
+-webkit-appearance: none;
+width: 100%;
+height: 6px;
+border-radius: 5px;
+background: #e5e7eb;
+outline: none;
+}
+.custom-range::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 18px;
+height: 18px;
+border-radius: 50%;
+background: #4f46e5;
+cursor: pointer;
+}
+.custom-range::-moz-range-thumb {
+width: 18px;
+height: 18px;
+border-radius: 50%;
+background: #4f46e5;
+cursor: pointer;
+border: none;
+}
+.sidebar-link.active {
+background-color: rgba(79, 70, 229, 0.1);
+color: #4f46e5;
+border-left: 3px solid #4f46e5;
+}
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: white;
+min-width: 200px;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+z-index: 50;
+border-radius: 8px;
+overflow: hidden;
+}
+.dropdown-content.show {
+display: block;
+}
+</style>
+</head>
+<body class="bg-gray-50">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside id="sidebar" class="w-64 bg-white shadow-md transition-all duration-300 ease-in-out z-20">
+<div class="p-4 border-b flex items-center">
+<span class="font-['Pacifico'] text-2xl text-primary">SmartBiz</span>
+</div>
+<div class="p-2 h-[calc(100vh-64px)] overflow-y-auto custom-scrollbar">
+<div class="space-y-1">
+<a href="https://readdy.ai/home/ad7ebef6-a3f4-4ac3-9d13-a01b5ae646bf/260ce0e8-faf6-4060-8ae9-f0ef4f4fc23b" data-readdy="true" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>Dashboard</span>
+</a>
+<a href="#" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-store-2-line"></i>
+</div>
+<span>Inventory</span>
+</a>
+<a href="#" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-shopping-cart-line"></i>
+</div>
+<span>Point of Sale</span>
+</a>
+<a href="#" class="sidebar-link active flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-user-3-line"></i>
+</div>
+<span>Customers</span>
+</a>
+<a href="#" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span>Expenses</span>
+</a>
+<a href="#" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-bar-chart-line"></i>
+</div>
+<span>Reports</span>
+</a>
+<a href="#" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-team-line"></i>
+</div>
+<span>Users</span>
+</a>
+<a href="#" class="sidebar-link flex items-center px-4 py-3 text-gray-700 rounded hover:bg-gray-100">
+<div class="w-6 h-6 flex items-center justify-center mr-3">
+<i class="ri-settings-3-line"></i>
+</div>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-8 px-4">
+<div class="bg-gray-50 p-4 rounded-lg">
+<div class="flex items-center mb-3">
+<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full text-primary mr-3">
+<i class="ri-cloud-line"></i>
+</div>
+<span class="text-sm font-medium">Sync Status</span>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs text-gray-500">Last synced:</span>
+<span class="text-xs font-medium">Today, 14:35</span>
+</div>
+<button class="w-full bg-primary/10 text-primary text-sm py-2 rounded-button flex items-center justify-center whitespace-nowrap">
+<i class="ri-refresh-line mr-2"></i> Sync Now
+</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="bg-white shadow-sm z-10">
+<div class="flex items-center justify-between px-6 py-3">
+<div class="flex items-center">
+<button id="sidebar-toggle" class="p-2 rounded-full hover:bg-gray-100 mr-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-menu-line"></i>
+</div>
+</button>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-search-line"></i>
+</div>
+</div>
+<input type="text" class="bg-gray-50 border-none text-gray-900 text-sm rounded-lg block w-64 pl-10 p-2.5" placeholder="Search customers...">
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-xs">
+<div class="w-3 h-3 flex items-center justify-center mr-1.5">
+<i class="ri-wifi-line"></i>
+</div>
+<span>Online</span>
+</div>
+<div class="relative">
+<button class="p-2 rounded-full hover:bg-gray-100 relative">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-notification-3-line"></i>
+</div>
+<span class="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">3</span>
+</button>
+</div>
+<div class="relative">
+<button id="branch-dropdown-btn" class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900">
+<span id="current-branch" class="mr-1">Main Branch</span>
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="branch-dropdown" class="dropdown-content right-0 mt-1">
+<div class="py-1">
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left branch-option active">
+<div class="w-4 h-4 flex items-center justify-center mr-2 text-primary">
+<i class="ri-check-line"></i>
+</div>
+<span>Main Branch</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left branch-option">
+<div class="w-4 h-4 flex items-center justify-center mr-2 opacity-0">
+<i class="ri-check-line"></i>
+</div>
+<span>Downtown Branch</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left branch-option">
+<div class="w-4 h-4 flex items-center justify-center mr-2 opacity-0">
+<i class="ri-check-line"></i>
+</div>
+<span>Westlands Branch</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left branch-option">
+<div class="w-4 h-4 flex items-center justify-center mr-2 opacity-0">
+<i class="ri-check-line"></i>
+</div>
+<span>Eastleigh Branch</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="custom-switch">
+<input type="checkbox" id="theme-toggle">
+<span class="slider"></span>
+</label>
+</div>
+<div class="relative">
+<button id="user-menu-button" class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="text-sm font-medium">JD</span>
+</div>
+<div class="hidden md:block text-left">
+<div class="text-sm font-medium">John Doe</div>
+<div class="text-xs text-gray-500">Admin</div>
+</div>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+<div>
+<div class="flex items-center mb-1">
+<h1 class="text-2xl font-bold text-gray-900 mr-2">Customers</h1>
+<span class="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">187 Total</span>
+</div>
+<p class="text-gray-600">Manage your customer relationships and track purchase history</p>
+</div>
+<div class="flex items-center space-x-3 mt-4 md:mt-0">
+<div class="relative">
+<button id="export-btn" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-download-2-line"></i>
+</div>
+<span>Export</span>
+</button>
+<div id="export-dropdown" class="dropdown-content right-0 mt-1 min-w-[200px]">
+<div class="py-1">
+<button id="export-csv" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-file-text-line"></i>
+</div>
+<span>CSV</span>
+</button>
+<button id="export-excel" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-file-excel-2-line"></i>
+</div>
+<span>Excel</span>
+</button>
+<button id="export-pdf" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-file-pdf-line"></i>
+</div>
+<span>PDF</span>
+</button>
+<button id="export-print" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-printer-line"></i>
+</div>
+<span>Print</span>
+</button>
+</div>
+</div>
+</div>
+<div id="export-dialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+<div class="p-4 border-b flex justify-between items-center">
+<h3 class="font-semibold text-gray-900 text-lg">Export Customers</h3>
+<button id="close-export-dialog" class="p-1.5 bg-gray-100 text-gray-700 rounded-full">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<div class="mb-6">
+<h4 class="font-medium text-gray-900 mb-3">Select Fields to Export</h4>
+<div class="space-y-2">
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Customer Name</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Contact Info (Email, Phone)</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Total Purchases</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Last Purchase Date</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Credit Status</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Customer Type</span>
+</label>
+</div>
+</div>
+<div class="mb-6">
+<h4 class="font-medium text-gray-900 mb-3">Filter Options</h4>
+<div class="space-y-4">
+<div>
+<label class="block text-sm text-gray-700 mb-1">Date Range</label>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+</div>
+<div>
+<input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm text-gray-700 mb-1">Customer Type</label>
+<select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+<option value="all">All Types</option>
+<option value="retail">Retail</option>
+<option value="wholesale">Wholesale</option>
+<option value="vip">VIP</option>
+</select>
+</div>
+</div>
+</div>
+<div id="export-progress" class="hidden">
+<div class="mb-4">
+<div class="flex justify-between mb-1">
+<span class="text-sm text-gray-700">Preparing export...</span>
+<span class="text-sm text-gray-700" id="export-percentage">0%</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div id="export-progress-bar" class="bg-primary rounded-full h-2" style="width: 0%"></div>
+</div>
+</div>
+</div>
+<div class="flex justify-end space-x-3">
+<button id="cancel-export" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white whitespace-nowrap">Cancel</button>
+<button id="start-export" class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap">Export</button>
+</div>
+</div>
+</div>
+</div>
+<button id="add-customer-btn" class="px-4 py-2 bg-primary text-white rounded-button flex items-center whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-user-add-line"></i>
+</div>
+<span>Add Customer</span>
+</button>
+</div>
+</div>
+<!-- Filters and Search -->
+<div class="bg-white rounded-lg shadow mb-6">
+<div class="p-4 border-b">
+<div class="flex flex-col md:flex-row md:items-center justify-between">
+<div class="flex items-center mb-4 md:mb-0">
+<div class="relative flex-1 min-w-[300px]">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-400">
+<i class="ri-search-line"></i>
+</div>
+</div>
+<input type="text" class="bg-gray-50 border-none text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5" placeholder="Search by name, email, phone or ID...">
+</div>
+</div>
+<div class="flex items-center space-x-3">
+<div class="relative">
+<button id="filter-dropdown-btn" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-filter-3-line"></i>
+</div>
+<span>Filters</span>
+</button>
+<div id="filter-dropdown" class="dropdown-content right-0 mt-2">
+<div class="p-4">
+<h4 class="font-medium text-gray-900 mb-3">Filter Customers</h4>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Credit Status</label>
+<div class="flex items-center space-x-4">
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="credit-status" value="all" checked>
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">All</span>
+</label>
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="credit-status" value="good">
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">Good Standing</span>
+</label>
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="credit-status" value="pending">
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">Pending</span>
+</label>
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="credit-status" value="hold">
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">Credit Hold</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+<div class="flex items-center space-x-4">
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" value="retail" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Retail</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" value="wholesale" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Wholesale</span>
+</label>
+<label class="flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" value="vip" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">VIP</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Registration Date</label>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="text-xs text-gray-500">From</label>
+<input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2">
+</div>
+<div>
+<label class="text-xs text-gray-500">To</label>
+<input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2">
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Purchase History</label>
+<div>
+<label class="text-xs text-gray-500">Minimum Purchase Amount (KSh)</label>
+<input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2" placeholder="0">
+</div>
+</div>
+<div class="flex items-center justify-between pt-3 border-t mt-4">
+<button class="text-gray-500 text-sm">Reset All</button>
+<button class="px-4 py-2 bg-primary text-white text-sm rounded-button whitespace-nowrap">Apply Filters</button>
+</div>
+</div>
+</div>
+</div>
+<div class="relative">
+<button id="view-dropdown-btn" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-list-check"></i>
+</div>
+<span>View</span>
+</button>
+<div id="view-dropdown" class="dropdown-content right-0 mt-2">
+<div class="py-1">
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2 text-primary">
+<i class="ri-table-line"></i>
+</div>
+<span>Table View</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-grid-line"></i>
+</div>
+<span>Card View</span>
+</button>
+</div>
+</div>
+</div>
+<div class="relative">
+<button id="sort-dropdown-btn" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-sort-desc"></i>
+</div>
+<span>Sort</span>
+</button>
+<div id="sort-dropdown" class="dropdown-content right-0 mt-2">
+<div class="py-1">
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<span>Name (A-Z)</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<span>Name (Z-A)</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<span>Date Added (Newest)</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<span>Date Added (Oldest)</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<span>Total Purchases (High-Low)</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<span>Total Purchases (Low-High)</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4">
+<div class="flex flex-wrap gap-2">
+<div class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm flex items-center">
+<span>Credit Status: All</span>
+<button class="ml-2 text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm flex items-center">
+<span>Customer Type: All</span>
+<button class="ml-2 text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm flex items-center">
+<span>VIP Customers</span>
+<button class="ml-2 text-gray-500">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<button class="text-primary text-sm font-medium">Clear All</button>
+</div>
+</div>
+</div>
+<!-- Quick Stats -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+<div class="bg-white rounded-lg shadow p-5">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-500 text-sm">Total Customers</p>
+<h3 class="text-2xl font-bold mt-1">187</h3>
+<div class="flex items-center mt-2 text-green-500 text-sm">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-arrow-up-line"></i>
+</div>
+<span>12% this month</span>
+</div>
+</div>
+<div class="w-10 h-10 flex items-center justify-center bg-blue-50 rounded-lg text-primary">
+<i class="ri-user-3-line ri-lg"></i>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow p-5">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-500 text-sm">VIP Customers</p>
+<h3 class="text-2xl font-bold mt-1">24</h3>
+<div class="flex items-center mt-2 text-green-500 text-sm">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-arrow-up-line"></i>
+</div>
+<span>3 new this month</span>
+</div>
+</div>
+<div class="w-10 h-10 flex items-center justify-center bg-yellow-50 rounded-lg text-yellow-600">
+<i class="ri-vip-crown-line ri-lg"></i>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow p-5">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-500 text-sm">Avg. Purchase Value</p>
+<h3 class="text-2xl font-bold mt-1">KSh 4,580</h3>
+<div class="flex items-center mt-2 text-green-500 text-sm">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-arrow-up-line"></i>
+</div>
+<span>8% this month</span>
+</div>
+</div>
+<div class="w-10 h-10 flex items-center justify-center bg-green-50 rounded-lg text-green-600">
+<i class="ri-money-dollar-circle-line ri-lg"></i>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow p-5">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-500 text-sm">Credit Outstanding</p>
+<h3 class="text-2xl font-bold mt-1">KSh 35,750</h3>
+<div class="flex items-center mt-2 text-red-500 text-sm">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-arrow-up-line"></i>
+</div>
+<span>5 overdue accounts</span>
+</div>
+</div>
+<div class="w-10 h-10 flex items-center justify-center bg-red-50 rounded-lg text-red-600">
+<i class="ri-bank-card-line ri-lg"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Customer Table -->
+<div class="bg-white rounded-lg shadow mb-6">
+<div class="p-4 border-b flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" id="select-all-customers">
+<span class="checkmark"></span>
+</label>
+<span class="text-sm font-medium">Select All</span>
+</div>
+<div class="flex items-center">
+<span class="text-sm text-gray-500 mr-3">8 selected</span>
+<div class="relative">
+<button id="bulk-actions-btn" class="px-3 py-1.5 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center text-sm whitespace-nowrap">
+<span>Bulk Actions</span>
+<div class="w-4 h-4 flex items-center justify-center ml-1">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="bulk-actions-dropdown" class="dropdown-content right-0 mt-1">
+<div class="py-1">
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-mail-send-line"></i>
+</div>
+<span>Send Email</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-message-2-line"></i>
+</div>
+<span>Send SMS</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-user-unfollow-line"></i>
+</div>
+<span>Delete Customers</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-price-tag-3-line"></i>
+</div>
+<span>Add Tag</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+<tr>
+<th class="px-5 py-3">
+<div class="flex items-center">
+<span>Customer</span>
+<button class="ml-1">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th class="px-5 py-3">
+<div class="flex items-center">
+<span>Contact Info</span>
+<button class="ml-1">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th class="px-5 py-3">
+<div class="flex items-center">
+<span>Total Purchases</span>
+<button class="ml-1">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th class="px-5 py-3">
+<div class="flex items-center">
+<span>Last Purchase</span>
+<button class="ml-1">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th class="px-5 py-3">
+<div class="flex items-center">
+<span>Credit Status</span>
+<button class="ml-1">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th class="px-5 py-3">
+<div class="flex items-center">
+<span>Customer Type</span>
+<button class="ml-1">
+<div class="w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+</div>
+</th>
+<th class="px-5 py-3">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">MO</span>
+</div>
+<div>
+<div class="font-medium text-gray-900 flex items-center">
+<span>Michael Otieno</span>
+<div class="w-4 h-4 flex items-center justify-center ml-1 text-yellow-500">
+<i class="ri-vip-crown-fill"></i>
+</div>
+</div>
+<div class="text-xs text-gray-500">#CUST-001</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>michael.otieno@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 712 345 678</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 245,500</td>
+<td class="px-5 py-4">Apr 23, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Credit Hold</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">VIP</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-1" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+<div id="more-actions-dropdown-1" class="dropdown-content right-0 mt-1">
+<div class="py-1">
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-mail-line"></i>
+</div>
+<span>Send Email</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-message-2-line"></i>
+</div>
+<span>Send SMS</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-history-line"></i>
+</div>
+<span>View Purchase History</span>
+</button>
+<button class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-vip-crown-line"></i>
+</div>
+<span>Add to VIP</span>
+</button>
+<button class="delete-customer-btn flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left">
+<div class="w-4 h-4 flex items-center justify-center mr-2">
+<i class="ri-delete-bin-line"></i>
+</div>
+<span>Delete Customer</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">FK</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">Faith Kimani</div>
+<div class="text-xs text-gray-500">#CUST-002</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>faith.kimani@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 723 456 789</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 87,250</td>
+<td class="px-5 py-4">Apr 20, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending Payment</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Retail</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-2" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">JM</span>
+</div>
+<div>
+<div class="font-medium text-gray-900 flex items-center">
+<span>Joseph Mutua</span>
+<div class="w-4 h-4 flex items-center justify-center ml-1 text-yellow-500">
+<i class="ri-vip-crown-fill"></i>
+</div>
+</div>
+<div class="text-xs text-gray-500">#CUST-003</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>joseph.mutua@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 734 567 890</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 156,750</td>
+<td class="px-5 py-4">Apr 18, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Good Standing</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">VIP</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-3" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">AW</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">Alice Wangari</div>
+<div class="text-xs text-gray-500">#CUST-004</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>alice.wangari@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 745 678 901</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 42,800</td>
+<td class="px-5 py-4">Apr 15, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Good Standing</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Retail</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-4" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">DO</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">David Omondi</div>
+<div class="text-xs text-gray-500">#CUST-005</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>david.omondi@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 756 789 012</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 68,350</td>
+<td class="px-5 py-4">Apr 12, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending Payment</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Wholesale</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-5" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">GN</span>
+</div>
+<div>
+<div class="font-medium text-gray-900">Grace Njeri</div>
+<div class="text-xs text-gray-500">#CUST-006</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>grace.njeri@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 767 890 123</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 94,200</td>
+<td class="px-5 py-4">Apr 10, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Good Standing</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Retail</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-6" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<tr class="bg-white border-b hover:bg-gray-50">
+<td class="px-5 py-4">
+<div class="flex items-center">
+<label class="custom-checkbox mr-3">
+<input type="checkbox" class="customer-select">
+<span class="checkmark"></span>
+</label>
+<div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">PK</span>
+</div>
+<div>
+<div class="font-medium text-gray-900 flex items-center">
+<span>Peter Kamau</span>
+<div class="w-4 h-4 flex items-center justify-center ml-1 text-yellow-500">
+<i class="ri-vip-crown-fill"></i>
+</div>
+</div>
+<div class="text-xs text-gray-500">#CUST-007</div>
+</div>
+</div>
+</td>
+<td class="px-5 py-4">
+<div>
+<div class="flex items-center mb-1">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-mail-line"></i>
+</div>
+<span>peter.kamau@example.com</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-gray-500">
+<i class="ri-phone-line"></i>
+</div>
+<span>+254 778 901 234</span>
+</div>
+</div>
+</td>
+<td class="px-5 py-4 font-medium">KSh 187,650</td>
+<td class="px-5 py-4">Apr 8, 2025</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Good Standing</span>
+</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">VIP</span>
+</td>
+<td class="px-5 py-4">
+<div class="flex items-center space-x-2">
+<button class="p-1.5 bg-primary/10 text-primary rounded-button whitespace-nowrap" title="View Profile">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Edit Customer">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-edit-line"></i>
+</div>
+</button>
+<button class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="Manage Credit">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-bank-card-line"></i>
+</div>
+</button>
+<div class="relative">
+<button id="more-actions-7" class="p-1.5 bg-gray-100 text-gray-700 rounded-button whitespace-nowrap" title="More Actions">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-more-2-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 flex items-center justify-between">
+<div class="text-sm text-gray-500">
+Showing <span class="font-medium">1</span> to <span class="font-medium">7</span> of <span class="font-medium">187</span> customers
+</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-1 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center text-sm whitespace-nowrap">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-arrow-left-s-line"></i>
+</div>
+<span>Previous</span>
+</button>
+<div class="flex items-center space-x-1">
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-full text-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full text-sm">2</button>
+<button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full text-sm">3</button>
+<span class="text-gray-500">...</span>
+<button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full text-sm">27</button>
+</div>
+<button class="px-3 py-1 border border-gray-300 rounded-button text-gray-700 bg-white flex items-center text-sm whitespace-nowrap">
+<span>Next</span>
+<div class="w-4 h-4 flex items-center justify-center ml-1">
+<i class="ri-arrow-right-s-line"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+<!-- Customer Insights -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+<div class="bg-white rounded-lg shadow">
+<div class="p-4 border-b flex justify-between items-center">
+<h3 class="font-semibold text-gray-900">Customer Acquisition</h3>
+<div>
+<select class="bg-gray-50 border-none text-gray-900 text-sm rounded-lg pr-8 p-2.5">
+<option>Last 6 Months</option>
+<option>Last 3 Months</option>
+<option>Last Month</option>
+</select>
+</div>
+</div>
+<div class="p-5">
+<div id="customer-acquisition-chart" style="width: 100%; height: 300px;"></div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow">
+<div class="p-4 border-b flex justify-between items-center">
+<h3 class="font-semibold text-gray-900">Customer Segments</h3>
+<button class="text-primary text-sm font-medium whitespace-nowrap">View Report</button>
+</div>
+<div class="p-5">
+<div id="customer-segments-chart" style="width: 100%; height: 300px;"></div>
+</div>
+</div>
+</div>
+<!-- Credit Status Summary -->
+<div class="bg-white rounded-lg shadow mb-6">
+<div class="p-4 border-b">
+<h3 class="font-semibold text-gray-900">Credit Status Summary</h3>
+</div>
+<div class="p-5">
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+<tr>
+<th class="px-5 py-3">Customer</th>
+<th class="px-5 py-3">Credit Amount</th>
+<th class="px-5 py-3">Due Date</th>
+<th class="px-5 py-3">Status</th>
+<th class="px-5 py-3">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white border-b">
+<td class="px-5 py-3">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">MO</span>
+</div>
+<span class="font-medium">Michael Otieno</span>
+</div>
+</td>
+<td class="px-5 py-3 font-medium">KSh 12,500</td>
+<td class="px-5 py-3">Apr 30, 2025</td>
+<td class="px-5 py-3">
+<span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Overdue</span>
+</td>
+<td class="px-5 py-3">
+<button class="text-primary whitespace-nowrap">Send Reminder</button>
+</td>
+</tr>
+<tr class="bg-white border-b">
+<td class="px-5 py-3">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">FK</span>
+</div>
+<span class="font-medium">Faith Kimani</span>
+</div>
+</td>
+<td class="px-5 py-3 font-medium">KSh 8,750</td>
+<td class="px-5 py-3">May 5, 2025</td>
+<td class="px-5 py-3">
+<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Upcoming</span>
+</td>
+<td class="px-5 py-3">
+<button class="text-primary whitespace-nowrap">Send Reminder</button>
+</td>
+</tr>
+<tr class="bg-white">
+<td class="px-5 py-3">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center mr-3">
+<span class="text-xs font-medium">DO</span>
+</div>
+<span class="font-medium">David Omondi</span>
+</div>
+</td>
+<td class="px-5 py-3 font-medium">KSh 5,800</td>
+<td class="px-5 py-3">May 12, 2025</td>
+<td class="px-5 py-3">
+<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Active</span>
+</td>
+<td class="px-5 py-3">
+<button class="text-primary whitespace-nowrap">Send Reminder</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<!-- Add Customer Modal (Hidden by default) -->
+<div id="delete-customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+<div class="p-4 border-b">
+<h3 class="font-semibold text-gray-900 text-lg">Delete Customer</h3>
+</div>
+<div class="p-6">
+<div class="mb-4">
+<div class="w-16 h-16 mx-auto bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+<i class="ri-delete-bin-line ri-2x"></i>
+</div>
+<p class="text-gray-700 text-center">Are you sure you want to delete this customer? This action cannot be undone.</p>
+</div>
+<div class="flex justify-end space-x-3">
+<button id="cancel-delete" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white whitespace-nowrap">Cancel</button>
+<button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap">Delete Customer</button>
+</div>
+</div>
+</div>
+</div>
+<div id="add-customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+<div class="p-4 border-b flex justify-between items-center">
+<h3 class="font-semibold text-gray-900 text-lg">Add New Customer</h3>
+<button id="close-add-customer-modal" class="p-1.5 bg-gray-100 text-gray-700 rounded-full">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">First Name*</label>
+<input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Enter first name">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Last Name*</label>
+<input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Enter last name">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Email Address*</label>
+<input type="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Enter email address">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Phone Number*</label>
+<input type="tel" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="Enter phone number">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+<div class="flex items-center space-x-4 mt-2">
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="customer-type" value="retail" checked>
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">Retail</span>
+</label>
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="customer-type" value="wholesale">
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">Wholesale</span>
+</label>
+<label class="flex items-center">
+<label class="custom-radio mr-2">
+<input type="radio" name="customer-type" value="vip">
+<span class="radiomark"></span>
+</label>
+<span class="text-sm">VIP</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Credit Limit (KSh)</label>
+<input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" placeholder="0">
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+<textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" rows="3" placeholder="Enter customer address"></textarea>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+<textarea class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" rows="2" placeholder="Add any additional notes"></textarea>
+</div>
+<div class="mt-6 flex items-center">
+<label class="custom-checkbox mr-2">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="text-sm">Send welcome email to customer</span>
+</div>
+<div class="mt-6 flex justify-end space-x-3">
+<button id="cancel-add-customer" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 bg-white whitespace-nowrap">Cancel</button>
+<button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap">Add Customer</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Button -->
+<div class="fixed bottom-6 right-6">
+<button id="floating-add-btn" class="w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-add-line ri-lg"></i>
+</div>
+</button>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// More Actions Dropdown
+function setupMoreActionsDropdown(buttonId, dropdownId) {
+const button = document.getElementById(buttonId);
+const dropdown = document.getElementById(dropdownId);
+if (button && dropdown) {
+button.addEventListener('click', function(event) {
+event.stopPropagation();
+dropdown.classList.toggle('show');
+// Hide other dropdowns
+document.querySelectorAll('.dropdown-content').forEach(el => {
+if (el.id !== dropdownId && el.classList.contains('show')) {
+el.classList.remove('show');
+}
+});
+});
+}
+}
+// Setup More Actions dropdown for each customer row
+for (let i = 1; i <= 7; i++) {
+setupMoreActionsDropdown(`more-actions-${i}`, `more-actions-dropdown-${i}`);
+}
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+const dropdowns = document.querySelectorAll('.dropdown-content');
+dropdowns.forEach(dropdown => {
+if (dropdown.classList.contains('show') && !dropdown.contains(event.target)) {
+dropdown.classList.remove('show');
+}
+});
+});
+// Delete Customer Functionality
+const deleteCustomerModal = document.getElementById('delete-customer-modal');
+const cancelDeleteBtn = document.getElementById('cancel-delete');
+const confirmDeleteBtn = document.getElementById('confirm-delete');
+document.querySelectorAll('.delete-customer-btn').forEach(btn => {
+btn.addEventListener('click', function() {
+deleteCustomerModal.classList.remove('hidden');
+});
+});
+if (cancelDeleteBtn) {
+cancelDeleteBtn.addEventListener('click', function() {
+deleteCustomerModal.classList.add('hidden');
+});
+}
+if (confirmDeleteBtn) {
+confirmDeleteBtn.addEventListener('click', function() {
+// Add your delete logic here
+deleteCustomerModal.classList.add('hidden');
+});
+}
+// Sidebar Toggle
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebar = document.getElementById('sidebar');
+sidebarToggle.addEventListener('click', function() {
+if (sidebar.classList.contains('w-64')) {
+sidebar.classList.remove('w-64');
+sidebar.classList.add('w-20');
+document.querySelectorAll('.sidebar-link span').forEach(el => {
+el.classList.add('hidden');
+});
+} else {
+sidebar.classList.remove('w-20');
+sidebar.classList.add('w-64');
+document.querySelectorAll('.sidebar-link span').forEach(el => {
+el.classList.remove('hidden');
+});
+}
+});
+// Dropdown toggles
+function setupDropdown(buttonId, dropdownId) {
+const button = document.getElementById(buttonId);
+const dropdown = document.getElementById(dropdownId);
+if (button && dropdown) {
+button.addEventListener('click', function() {
+dropdown.classList.toggle('show');
+});
+document.addEventListener('click', function(event) {
+if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+dropdown.classList.remove('show');
+}
+});
+}
+}
+setupDropdown('filter-dropdown-btn', 'filter-dropdown');
+setupDropdown('view-dropdown-btn', 'view-dropdown');
+setupDropdown('sort-dropdown-btn', 'sort-dropdown');
+setupDropdown('bulk-actions-btn', 'bulk-actions-dropdown');
+setupDropdown('export-btn', 'export-dropdown');
+setupDropdown('branch-dropdown-btn', 'branch-dropdown');
+// Branch selection functionality
+const branchDropdown = document.getElementById('branch-dropdown');
+const currentBranchText = document.getElementById('current-branch');
+const branchOptions = document.querySelectorAll('.branch-option');
+branchOptions.forEach(option => {
+option.addEventListener('click', function() {
+const branchName = this.querySelector('span').textContent;
+currentBranchText.textContent = branchName;
+// Update checkmark visibility
+branchOptions.forEach(opt => {
+const checkmark = opt.querySelector('.w-4');
+if (opt === this) {
+checkmark.classList.remove('opacity-0');
+opt.classList.add('active');
+} else {
+checkmark.classList.add('opacity-0');
+opt.classList.remove('active');
+}
+});
+// Hide dropdown after selection
+branchDropdown.classList.remove('show');
+});
+});
+// Export functionality
+const exportDialog = document.getElementById('export-dialog');
+const closeExportDialog = document.getElementById('close-export-dialog');
+const cancelExport = document.getElementById('cancel-export');
+const startExport = document.getElementById('start-export');
+const exportProgress = document.getElementById('export-progress');
+const exportProgressBar = document.getElementById('export-progress-bar');
+const exportPercentage = document.getElementById('export-percentage');
+function showExportDialog() {
+exportDialog.classList.remove('hidden');
+exportProgress.classList.add('hidden');
+exportProgressBar.style.width = '0%';
+exportPercentage.textContent = '0%';
+}
+function closeDialog() {
+exportDialog.classList.add('hidden');
+}
+function simulateExport() {
+exportProgress.classList.remove('hidden');
+let progress = 0;
+const interval = setInterval(() => {
+progress += 10;
+exportProgressBar.style.width = `${progress}%`;
+exportPercentage.textContent = `${progress}%`;
+if (progress >= 100) {
+clearInterval(interval);
+setTimeout(() => {
+closeDialog();
+}, 500);
+}
+}, 200);
+}
+document.getElementById('export-csv').addEventListener('click', () => {
+document.getElementById('export-dropdown').classList.remove('show');
+showExportDialog();
+});
+document.getElementById('export-excel').addEventListener('click', () => {
+document.getElementById('export-dropdown').classList.remove('show');
+showExportDialog();
+});
+document.getElementById('export-pdf').addEventListener('click', () => {
+document.getElementById('export-dropdown').classList.remove('show');
+showExportDialog();
+});
+document.getElementById('export-print').addEventListener('click', () => {
+document.getElementById('export-dropdown').classList.remove('show');
+showExportDialog();
+});
+closeExportDialog.addEventListener('click', closeDialog);
+cancelExport.addEventListener('click', closeDialog);
+startExport.addEventListener('click', simulateExport);
+// Add Customer Modal
+const addCustomerBtn = document.getElementById('add-customer-btn');
+const floatingAddBtn = document.getElementById('floating-add-btn');
+const addCustomerModal = document.getElementById('add-customer-modal');
+const closeAddCustomerModal = document.getElementById('close-add-customer-modal');
+const cancelAddCustomer = document.getElementById('cancel-add-customer');
+function openAddCustomerModal() {
+addCustomerModal.classList.remove('hidden');
+}
+function closeModal() {
+addCustomerModal.classList.add('hidden');
+}
+if (addCustomerBtn) {
+addCustomerBtn.addEventListener('click', openAddCustomerModal);
+}
+if (floatingAddBtn) {
+floatingAddBtn.addEventListener('click', openAddCustomerModal);
+}
+if (closeAddCustomerModal) {
+closeAddCustomerModal.addEventListener('click', closeModal);
+}
+if (cancelAddCustomer) {
+cancelAddCustomer.addEventListener('click', closeModal);
+}
+// Select All Checkboxes
+const selectAllCheckbox = document.getElementById('select-all-customers');
+const customerCheckboxes = document.querySelectorAll('.customer-select');
+if (selectAllCheckbox) {
+selectAllCheckbox.addEventListener('change', function() {
+customerCheckboxes.forEach(checkbox => {
+checkbox.checked = selectAllCheckbox.checked;
+});
+});
+}
+// Customer Acquisition Chart
+const customerAcquisitionChart = echarts.init(document.getElementById('customer-acquisition-chart'));
+const customerAcquisitionOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.8)',
+textStyle: {
+color: '#1f2937'
+}
+},
+grid: {
+top: 10,
+right: 10,
+bottom: 20,
+left: 40
+},
+xAxis: {
+type: 'category',
+data: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+axisLine: {
+lineStyle: {
+color: '#e5e7eb'
+}
+},
+axisLabel: {
+color: '#1f2937'
+}
+},
+yAxis: {
+type: 'value',
+axisLine: {
+show: false
+},
+axisLabel: {
+color: '#1f2937'
+},
+splitLine: {
+lineStyle: {
+color: '#e5e7eb'
+}
+}
+},
+series: [
+{
+name: 'New Customers',
+type: 'bar',
+barWidth: 20,
+itemStyle: {
+color: 'rgba(87, 181, 231, 1)',
+borderRadius: [4, 4, 0, 0]
+},
+data: [18, 25, 32, 22, 28, 35]
+}
+]
+};
+customerAcquisitionChart.setOption(customerAcquisitionOption);
+// Customer Segments Chart
+const customerSegmentsChart = echarts.init(document.getElementById('customer-segments-chart'));
+const customerSegmentsOption = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.8)',
+textStyle: {
+color: '#1f2937'
+}
+},
+legend: {
+orient: 'vertical',
+right: 10,
+top: 'center',
+textStyle: {
+color: '#1f2937'
+}
+},
+series: [
+{
+name: 'Customer Segments',
+type: 'pie',
+radius: ['40%', '70%'],
+center: ['40%', '50%'],
+avoidLabelOverlap: false,
+itemStyle: {
+borderRadius: 8,
+borderColor: '#fff',
+borderWidth: 2
+},
+label: {
+show: false
+},
+emphasis: {
+label: {
+show: false
+}
+},
+labelLine: {
+show: false
+},
+data: [
+{ value: 110, name: 'Retail', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+{ value: 53, name: 'Wholesale', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+{ value: 24, name: 'VIP', itemStyle: { color: 'rgba(251, 191, 114, 1)' } }
+]
+}
+]
+};
+customerSegmentsChart.setOption(customerSegmentsOption);
+// Resize charts when window resizes
+window.addEventListener('resize', function() {
+customerAcquisitionChart.resize();
+customerSegmentsChart.resize();
+});
+});
+</script>
+</body>
+</html>
