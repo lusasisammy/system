@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartBiz - Inventory Management</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#10b981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f9fafb;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+.custom-checkbox {
+position: relative;
+display: inline-block;
+width: 18px;
+height: 18px;
+}
+.custom-checkbox input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.checkmark {
+position: absolute;
+top: 0;
+left: 0;
+width: 18px;
+height: 18px;
+background-color: #fff;
+border: 2px solid #d1d5db;
+border-radius: 4px;
+transition: all 0.2s ease;
+}
+.custom-checkbox input:checked ~ .checkmark {
+background-color: #4f46e5;
+border-color: #4f46e5;
+}
+.checkmark:after {
+content: "";
+position: absolute;
+display: none;
+}
+.custom-checkbox input:checked ~ .checkmark:after {
+display: block;
+}
+.custom-checkbox .checkmark:after {
+left: 5px;
+top: 2px;
+width: 6px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.switch {
+position: relative;
+display: inline-block;
+width: 44px;
+height: 24px;
+}
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #e5e7eb;
+transition: .4s;
+border-radius: 24px;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 18px;
+width: 18px;
+left: 3px;
+bottom: 3px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .slider {
+background-color: #4f46e5;
+}
+input:checked + .slider:before {
+transform: translateX(20px);
+}
+.custom-range {
+-webkit-appearance: none;
+width: 100%;
+height: 6px;
+background: #e5e7eb;
+border-radius: 5px;
+outline: none;
+}
+.custom-range::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 18px;
+height: 18px;
+background: #4f46e5;
+border-radius: 50%;
+cursor: pointer;
+}
+.stock-indicator {
+width: 100%;
+height: 6px;
+border-radius: 3px;
+overflow: hidden;
+}
+.stock-critical {
+background-color: #ef4444;
+}
+.stock-low {
+background-color: #f97316;
+}
+.stock-normal {
+background-color: #10b981;
+}
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: white;
+min-width: 200px;
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+border-radius: 8px;
+z-index: 50;
+}
+.dropdown:hover .dropdown-content {
+display: block;
+}
+</style>
+</head>
+<body class="h-screen flex overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full">
+<div class="p-4 border-b border-gray-200 flex items-center">
+<div class="font-['Pacifico'] text-2xl text-primary">SmartBiz</div>
+</div>
+<div class="p-4 border-b border-gray-200">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+<i class="ri-user-line text-gray-600"></i>
+</div>
+<div>
+<div class="font-medium text-sm">James Mwangi</div>
+<div class="text-xs text-gray-500">Admin • Nairobi Branch</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-4">
+<div class="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+<a href="https://readdy.ai/home/d5040197-c31f-4374-afdc-0429f5f70a96/41a070bb-2873-445a-a336-66d5e56975b4" data-readdy="true" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-dashboard-line"></i>
+</div>
+<span>Dashboard</span>
+</a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-primary bg-indigo-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-store-2-line"></i>
+</div>
+<span>Inventory</span>
+</a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-shopping-cart-line"></i>
+</div>
+<span>Point of Sale</span>
+</a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-user-3-line"></i>
+</div>
+<span>Customers</span>
+</a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-money-dollar-circle-line"></i>
+</div>
+<span>Expenses</span>
+</a>
+<div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Reports</div>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-line-chart-line"></i>
+</div>
+<span>Sales Reports</span>
+</a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-pie-chart-line"></i>
+</div>
+<span>Financial Reports</span>
+</a>
+<div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</div>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-user-settings-line"></i>
+</div>
+<span>User Management</span>
+</a>
+<a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center">
+<i class="ri-settings-3-line"></i>
+</div>
+<span>System Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-gray-200">
+<div class="flex items-center justify-between">
+<div class="flex items-center text-sm text-gray-500">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-wifi-line"></i>
+</div>
+<span>Online</span>
+</div>
+<div>
+<label class="switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<div class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="bg-white border-b border-gray-200 flex items-center justify-between px-6 py-3">
+<div class="flex items-center">
+<button class="text-gray-600 focus:outline-none lg:hidden">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-menu-line"></i>
+</div>
+</button>
+<div class="relative mx-4 lg:mx-0 w-64">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-search-line"></i>
+</div>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-md text-sm placeholder-gray-500 focus:outline-none focus:border-primary" type="text" placeholder="Search products...">
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="relative">
+<button class="flex items-center focus:outline-none">
+<div class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700">
+<i class="ri-notification-3-line"></i>
+</div>
+<div class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+</button>
+</div>
+<div class="relative">
+<button class="flex items-center focus:outline-none">
+<div class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700">
+<i class="ri-question-line"></i>
+</div>
+</button>
+</div>
+<div class="border-l border-gray-200 h-6 mx-2"></div>
+<div class="relative">
+<button id="profileButton" class="flex items-center space-x-2 focus:outline-none">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+<i class="ri-user-line text-gray-600"></i>
+</div>
+<div class="hidden md:block text-sm font-medium text-gray-700">James</div>
+<div class="w-5 h-5 flex items-center justify-center text-gray-500">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="profileDropdown" class="hidden absolute right-6 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+<div class="py-2 px-3">
+<div class="flex items-center space-x-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+<i class="ri-user-line text-gray-600"></i>
+</div>
+<div>
+<div class="text-sm font-medium text-gray-900">James Mwangi</div>
+<div class="text-xs text-gray-500">james.m@example.com</div>
+</div>
+</div>
+</div>
+<div class="py-1">
+<a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center text-gray-400 group-hover:text-primary">
+<i class="ri-user-settings-line"></i>
+</div>
+My Profile
+</a>
+<a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center text-gray-400 group-hover:text-primary">
+<i class="ri-settings-3-line"></i>
+</div>
+Account Settings
+</a>
+<a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center text-gray-400 group-hover:text-primary">
+<i class="ri-palette-line"></i>
+</div>
+Preferences
+</a>
+</div>
+<div class="py-1">
+<a href="#" class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center text-gray-400 group-hover:text-primary">
+<i class="ri-question-line"></i>
+</div>
+Help & Support
+</a>
+</div>
+<div class="py-1">
+<a href="#" class="group flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
+<div class="w-5 h-5 mr-3 flex items-center justify-center text-red-500">
+<i class="ri-logout-box-line"></i>
+</div>
+Logout
+</a>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+<div class="mb-6 flex justify-between items-center">
+<div>
+<h1 class="text-2xl font-bold text-gray-900">Inventory Management</h1>
+<p class="text-sm text-gray-500">Manage your products, stock levels, and suppliers</p>
+</div>
+<div class="flex space-x-3">
+<div class="relative" id="exportDropdown">
+<button id="exportBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 flex items-center !rounded-button whitespace-nowrap">
+<div class="w-4 h-4 mr-2 flex items-center justify-center">
+<i class="ri-download-line"></i>
+</div>
+<span id="exportBtnText">Export</span>
+<div class="w-4 h-4 ml-2 flex items-center justify-center">
+<i id="exportBtnIcon" class="ri-arrow-down-s-line"></i>
+<i id="exportBtnLoading" class="ri-loader-4-line animate-spin hidden"></i>
+</div>
+</button>
+<div id="exportMenu" class="hidden absolute right-0 mt-2 py-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+<div class="px-4 py-2">
+<label class="flex items-center">
+<input type="radio" name="exportScope" value="all" checked class="text-primary">
+<span class="ml-2 text-sm text-gray-700">All Products</span>
+</label>
+<label class="flex items-center mt-1">
+<input type="radio" name="exportScope" value="filtered" class="text-primary">
+<span class="ml-2 text-sm text-gray-700">Filtered Products</span>
+</label>
+<label class="flex items-center mt-1">
+<input type="radio" name="exportScope" value="selected" class="text-primary">
+<span class="ml-2 text-sm text-gray-700">Selected Products</span>
+</label>
+</div>
+<div class="border-t border-gray-100 mt-2"></div>
+<button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center" id="exportCSV">
+<div class="w-4 h-4 mr-3 flex items-center justify-center">
+<i class="ri-file-text-line"></i>
+</div>
+Export as CSV
+</button>
+<button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center" id="exportExcel">
+<div class="w-4 h-4 mr-3 flex items-center justify-center">
+<i class="ri-file-excel-2-line"></i>
+</div>
+Export as Excel
+</button>
+<button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center" id="exportPDF">
+<div class="w-4 h-4 mr-3 flex items-center justify-center">
+<i class="ri-file-pdf-line"></i>
+</div>
+Export as PDF
+</button>
+</div>
+</div>
+<button class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium flex items-center !rounded-button whitespace-nowrap" id="addProductBtn">
+<div class="w-4 h-4 mr-2 flex items-center justify-center">
+<i class="ri-add-line"></i>
+</div>
+Add Product
+</button>
+</div>
+</div>
+<!-- Filters and Search -->
+<div class="bg-white rounded shadow mb-6">
+<div class="p-4 flex flex-wrap items-center justify-between gap-4">
+<div class="flex space-x-2">
+<button id="allProductsBtn" class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium !rounded-button whitespace-nowrap">All Products</button>
+<button id="lowStockBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 !rounded-button whitespace-nowrap">Low Stock</button>
+<button id="outOfStockBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700 !rounded-button whitespace-nowrap">Out of Stock</button>
+</div>
+<div class="flex space-x-3">
+<div class="relative dropdown">
+<button class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 flex items-center !rounded-button whitespace-nowrap">
+<div class="w-4 h-4 mr-2 flex items-center justify-center">
+<i class="ri-filter-3-line"></i>
+</div>
+Filters
+<div class="w-4 h-4 ml-2 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div class="dropdown-content right-0 mt-2 p-4 w-72">
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+<select class="w-full border border-gray-300 rounded-md text-sm p-2 pr-8">
+<option value="">All Categories</option>
+<option value="electronics">Electronics</option>
+<option value="clothing">Clothing</option>
+<option value="groceries">Groceries</option>
+<option value="beauty">Beauty & Personal Care</option>
+</select>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
+<div class="flex items-center space-x-2">
+<input type="number" placeholder="Min" class="w-full border border-gray-300 rounded-md text-sm p-2">
+<span class="text-gray-500">-</span>
+<input type="number" placeholder="Max" class="w-full border border-gray-300 rounded-md text-sm p-2">
+</div>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-1">Stock Status</label>
+<div class="space-y-2">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" checked>
+<span class="checkmark"></span>
+</label>
+<span class="ml-2 text-sm text-gray-700">In Stock</span>
+</div>
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox">
+<span class="checkmark"></span>
+</label>
+<span class="ml-2 text-sm text-gray-700">Low Stock</span>
+</div>
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox">
+<span class="checkmark"></span>
+</label>
+<span class="ml-2 text-sm text-gray-700">Out of Stock</span>
+</div>
+</div>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+<select class="w-full border border-gray-300 rounded-md text-sm p-2 pr-8">
+<option value="">All Suppliers</option>
+<option value="nairobi-electronics">Nairobi Electronics Ltd</option>
+<option value="mombasa-textiles">Mombasa Textiles</option>
+<option value="nakuru-wholesalers">Nakuru Wholesalers</option>
+<option value="kisumu-distributors">Kisumu Distributors</option>
+</select>
+</div>
+<div class="flex justify-end">
+<button class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium !rounded-button whitespace-nowrap">Apply Filters</button>
+</div>
+</div>
+</div>
+<div class="relative dropdown">
+<button class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 flex items-center !rounded-button whitespace-nowrap">
+<div class="w-4 h-4 mr-2 flex items-center justify-center">
+<i class="ri-sort-desc"></i>
+</div>
+Sort By
+<div class="w-4 h-4 ml-2 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div class="dropdown-content right-0 mt-2 py-2 w-48">
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Name (A-Z)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Name (Z-A)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Price (Low to High)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Price (High to Low)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Stock (Low to High)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Stock (High to Low)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Date Added (Newest)</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Date Added (Oldest)</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Products Table -->
+<div class="bg-white rounded shadow overflow-hidden">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th scope="col" class="px-6 py-3 text-left">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" id="selectAll">
+<span class="checkmark"></span>
+</label>
+<span class="ml-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Product</span>
+</div>
+</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+<th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-smartphone-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<a href="https://readdy.ai/home/d5040197-c31f-4374-afdc-0429f5f70a96/41a070bb-2873-445a-a336-66d5e56975b4" data-readdy="true" class="text-sm font-medium text-gray-900 hover:text-primary">Samsung Galaxy A53</a>
+<div class="text-xs text-gray-500">SKU: SM-A53-BLK</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Electronics</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">3 units</div>
+<div class="stock-indicator stock-critical"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 32,999</div>
+<div class="text-xs text-gray-500">Cost: KSh 28,500</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Nairobi Electronics Ltd</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Critical Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-t-shirt-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">Men's Cotton T-Shirt (L)</div>
+<div class="text-xs text-gray-500">SKU: MT-CTN-LRG-BLK</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Clothing</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">8 units</div>
+<div class="stock-indicator stock-low"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 1,200</div>
+<div class="text-xs text-gray-500">Cost: KSh 750</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Mombasa Textiles</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Low Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-headphone-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">JBL Wireless Headphones</div>
+<div class="text-xs text-gray-500">SKU: JBL-WH-350-BLK</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Electronics</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">0 units</div>
+<div class="stock-indicator stock-critical"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 8,500</div>
+<div class="text-xs text-gray-500">Cost: KSh 6,800</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Nairobi Electronics Ltd</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Out of Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-shampoo-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">Dove Shampoo 400ml</div>
+<div class="text-xs text-gray-500">SKU: DV-SH-400-REG</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-pink-100 text-pink-800">Beauty</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">24 units</div>
+<div class="stock-indicator stock-normal"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 650</div>
+<div class="text-xs text-gray-500">Cost: KSh 450</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Nakuru Wholesalers</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">In Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-tablet-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">iPad 10th Gen 64GB</div>
+<div class="text-xs text-gray-500">SKU: APL-IP-10-64-SLV</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">Electronics</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">5 units</div>
+<div class="stock-indicator stock-low"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 65,000</div>
+<div class="text-xs text-gray-500">Cost: KSh 58,000</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Nairobi Electronics Ltd</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">Low Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-shopping-basket-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">Maize Flour 2kg</div>
+<div class="text-xs text-gray-500">SKU: MZ-FL-2KG-REG</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Groceries</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">42 units</div>
+<div class="stock-indicator stock-normal"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 180</div>
+<div class="text-xs text-gray-500">Cost: KSh 150</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Kisumu Distributors</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">In Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<label class="custom-checkbox">
+<input type="checkbox" class="product-checkbox">
+<span class="checkmark"></span>
+</label>
+<div class="ml-3 flex items-center">
+<div class="h-10 w-10 flex-shrink-0 rounded bg-gray-100 flex items-center justify-center">
+<i class="ri-watch-line text-gray-500 text-lg"></i>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">Casio Men's Watch</div>
+<div class="text-xs text-gray-500">SKU: CS-WCH-M-SLV</div>
+</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">Accessories</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900 mb-1">12 units</div>
+<div class="stock-indicator stock-normal"></div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">KSh 5,500</div>
+<div class="text-xs text-gray-500">Cost: KSh 4,200</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Nairobi Electronics Ltd</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">In Stock</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex justify-end space-x-2">
+<button class="p-1 rounded-full hover:bg-gray-100" title="Edit">
+<div class="w-6 h-6 flex items-center justify-center text-gray-500">
+<i class="ri-pencil-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Restock">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-stack-line"></i>
+</div>
+</button>
+<button class="p-1 rounded-full hover:bg-gray-100" title="Delete">
+<div class="w-6 h-6 flex items-center justify-center text-red-500">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+<div class="flex-1 flex justify-between sm:hidden">
+<button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 !rounded-button whitespace-nowrap">Previous</button>
+<button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 !rounded-button whitespace-nowrap">Next</button>
+</div>
+<div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-gray-700">
+Showing <span class="font-medium">1</span> to <span class="font-medium">7</span> of <span class="font-medium">23</span> results
+</p>
+</div>
+<div>
+<nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+<button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+<span class="sr-only">Previous</span>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-left-s-line"></i>
+</div>
+</button>
+<button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-primary text-sm font-medium text-white">1</button>
+<button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">2</button>
+<button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">3</button>
+<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>
+<button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">8</button>
+<button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+<span class="sr-only">Next</span>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-right-s-line"></i>
+</div>
+</button>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Add Product Modal -->
+<div id="addProductModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+<div class="fixed inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto">
+<div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+<h3 class="text-lg font-medium text-gray-900">Add New Product</h3>
+<button id="closeModalBtn" class="text-gray-400 hover:text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<form id="addProductForm">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="col-span-2">
+<label for="productName" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+<input type="text" id="productName" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter product name">
+</div>
+<div>
+<label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+<select id="productCategory" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+<option value="">Select category</option>
+<option value="electronics">Electronics</option>
+<option value="clothing">Clothing</option>
+<option value="groceries">Groceries</option>
+<option value="beauty">Beauty & Personal Care</option>
+<option value="accessories">Accessories</option>
+</select>
+</div>
+<div>
+<label for="productSKU" class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+<input type="text" id="productSKU" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter SKU">
+</div>
+<div>
+<label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1">Selling Price (KSh)</label>
+<input type="number" id="productPrice" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.00">
+</div>
+<div>
+<label for="productCost" class="block text-sm font-medium text-gray-700 mb-1">Cost Price (KSh)</label>
+<input type="number" id="productCost" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.00">
+</div>
+<div>
+<label for="productStock" class="block text-sm font-medium text-gray-700 mb-1">Initial Stock</label>
+<input type="number" id="productStock" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+</div>
+<div>
+<label for="productSupplier" class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+<select id="productSupplier" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+<option value="">Select supplier</option>
+<option value="nairobi-electronics">Nairobi Electronics Ltd</option>
+<option value="mombasa-textiles">Mombasa Textiles</option>
+<option value="nakuru-wholesalers">Nakuru Wholesalers</option>
+<option value="kisumu-distributors">Kisumu Distributors</option>
+</select>
+</div>
+<div class="col-span-2">
+<label for="productDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+<textarea id="productDescription" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter product description"></textarea>
+</div>
+<div class="col-span-2">
+<label class="block text-sm font-medium text-gray-700 mb-1">Stock Alert Levels</label>
+<div class="flex items-center space-x-4">
+<div class="flex items-center">
+<span class="text-sm text-gray-500 mr-2">Low Stock:</span>
+<input type="number" class="w-16 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="15">
+</div>
+<div class="flex items-center">
+<span class="text-sm text-gray-500 mr-2">Critical Stock:</span>
+<input type="number" class="w-16 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="5">
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 flex justify-end space-x-3">
+<button type="button" id="cancelAddBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap">Cancel</button>
+<button type="submit" class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium !rounded-button whitespace-nowrap">Add Product</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Restock Modal -->
+<div id="restockModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+<div class="fixed inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg shadow-xl w-full max-w-md relative z-10">
+<div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+<h3 class="text-lg font-medium text-gray-900">Restock Product</h3>
+<button id="closeRestockModalBtn" class="text-gray-400 hover:text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<div class="mb-4">
+<div class="font-medium text-gray-900">Samsung Galaxy A53</div>
+<div class="text-sm text-gray-500">SKU: SM-A53-BLK</div>
+</div>
+<div class="mb-4">
+<label for="currentStock" class="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
+<input type="text" id="currentStock" value="3" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-100" readonly>
+</div>
+<div class="mb-4">
+<label for="addStock" class="block text-sm font-medium text-gray-700 mb-1">Add Stock</label>
+<input type="number" id="addStock" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter quantity">
+</div>
+<div class="mb-4">
+<label for="supplier" class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+<select id="supplier" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+<option value="nairobi-electronics">Nairobi Electronics Ltd</option>
+<option value="mombasa-textiles">Mombasa Textiles</option>
+<option value="nakuru-wholesalers">Nakuru Wholesalers</option>
+<option value="kisumu-distributors">Kisumu Distributors</option>
+</select>
+</div>
+<div class="mb-4">
+<label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
+<textarea id="notes" rows="2" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter notes"></textarea>
+</div>
+<div class="mt-6 flex justify-end space-x-3">
+<button type="button" id="cancelRestockBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap">Cancel</button>
+<button type="button" class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium !rounded-button whitespace-nowrap">Confirm Restock</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// Edit Product Modal
+const editProductModal = document.getElementById('editProductModal');
+const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+const editProductForm = document.getElementById('editProductForm');
+
+// Add click event listeners to all edit buttons
+document.querySelectorAll('[title="Edit"]').forEach(btn => {
+btn.addEventListener('click', function() {
+const row = this.closest('tr');
+const productName = row.querySelector('td:first-child .text-sm.font-medium').textContent;
+const productSKU = row.querySelector('td:first-child .text-xs.text-gray-500').textContent.replace('SKU: ', '');
+const category = row.querySelector('td:nth-child(2) span').textContent;
+const stock = parseInt(row.querySelector('td:nth-child(3) .text-sm').textContent);
+const price = parseFloat(row.querySelector('td:nth-child(4) .text-sm').textContent.replace('KSh ', '').replace(',', ''));
+const cost = parseFloat(row.querySelector('td:nth-child(4) .text-xs').textContent.replace('Cost: KSh ', '').replace(',', ''));
+const supplier = row.querySelector('td:nth-child(5) .text-sm').textContent;
+
+document.getElementById('editProductName').value = productName;
+document.getElementById('editProductSKU').value = productSKU;
+document.getElementById('editProductCategory').value = category.toLowerCase();
+document.getElementById('editProductStock').value = stock;
+document.getElementById('editProductPrice').value = price;
+document.getElementById('editProductCost').value = cost;
+document.getElementById('editProductSupplier').value = supplier.toLowerCase().replace(' ', '-');
+
+editProductModal.classList.remove('hidden');
+});
+});
+
+closeEditModalBtn.addEventListener('click', () => {
+editProductModal.classList.add('hidden');
+});
+
+cancelEditBtn.addEventListener('click', () => {
+editProductModal.classList.add('hidden');
+});
+
+editProductForm.addEventListener('submit', function(e) {
+e.preventDefault();
+// Here you would normally process the form data and update the product
+editProductModal.classList.add('hidden');
+});
+
+// Profile Dropdown
+const profileButton = document.getElementById('profileButton');
+const profileDropdown = document.getElementById('profileDropdown');
+let isProfileDropdownOpen = false;
+function toggleProfileDropdown() {
+isProfileDropdownOpen = !isProfileDropdownOpen;
+profileDropdown.classList.toggle('hidden');
+}
+function closeProfileDropdown() {
+if (isProfileDropdownOpen) {
+isProfileDropdownOpen = false;
+profileDropdown.classList.add('hidden');
+}
+}
+profileButton.addEventListener('click', (e) => {
+e.stopPropagation();
+toggleProfileDropdown();
+});
+document.addEventListener('click', (e) => {
+if (!profileButton.contains(e.target) && !profileDropdown.contains(e.target)) {
+closeProfileDropdown();
+}
+});
+profileDropdown.addEventListener('click', (e) => {
+if (e.target.tagName === 'A') {
+closeProfileDropdown();
+}
+});
+// Export functionality
+const exportBtn = document.getElementById('exportBtn');
+const exportMenu = document.getElementById('exportMenu');
+const exportBtnText = document.getElementById('exportBtnText');
+const exportBtnIcon = document.getElementById('exportBtnIcon');
+const exportBtnLoading = document.getElementById('exportBtnLoading');
+const exportCSV = document.getElementById('exportCSV');
+const exportExcel = document.getElementById('exportExcel');
+const exportPDF = document.getElementById('exportPDF');
+let isExporting = false;
+function toggleExportMenu() {
+if (!isExporting) {
+exportMenu.classList.toggle('hidden');
+}
+}
+function startExport(format) {
+if (isExporting) return;
+isExporting = true;
+exportMenu.classList.add('hidden');
+exportBtnText.textContent = `Exporting ${format}...`;
+exportBtnIcon.classList.add('hidden');
+exportBtnLoading.classList.remove('hidden');
+// Simulate export process
+setTimeout(() => {
+isExporting = false;
+exportBtnText.textContent = 'Export';
+exportBtnIcon.classList.remove('hidden');
+exportBtnLoading.classList.add('hidden');
+}, 2000);
+}
+exportBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+toggleExportMenu();
+});
+exportCSV.addEventListener('click', () => startExport('CSV'));
+exportExcel.addEventListener('click', () => startExport('Excel'));
+exportPDF.addEventListener('click', () => startExport('PDF'));
+document.addEventListener('click', (e) => {
+if (!exportBtn.contains(e.target) && !exportMenu.contains(e.target)) {
+exportMenu.classList.add('hidden');
+}
+});
+// Filter Buttons
+const allProductsBtn = document.getElementById('allProductsBtn');
+const lowStockBtn = document.getElementById('lowStockBtn');
+const outOfStockBtn = document.getElementById('outOfStockBtn');
+const productRows = document.querySelectorAll('tbody tr');
+function setActiveFilter(activeBtn) {
+[allProductsBtn, lowStockBtn, outOfStockBtn].forEach(btn => {
+btn.classList.remove('bg-primary', 'text-white');
+btn.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+});
+activeBtn.classList.remove('bg-white', 'border', 'border-gray-300', 'text-gray-700');
+activeBtn.classList.add('bg-primary', 'text-white');
+}
+function filterProducts(status) {
+productRows.forEach(row => {
+const stockStatus = row.querySelector('td:nth-child(6) span').textContent;
+if (status === 'all') {
+row.style.display = '';
+} else {
+row.style.display = stockStatus === status ? '' : 'none';
+}
+});
+}
+allProductsBtn.addEventListener('click', function() {
+setActiveFilter(this);
+filterProducts('all');
+});
+lowStockBtn.addEventListener('click', function() {
+setActiveFilter(this);
+filterProducts('Low Stock');
+});
+outOfStockBtn.addEventListener('click', function() {
+setActiveFilter(this);
+filterProducts('Out of Stock');
+});
+// Select All Checkbox
+const selectAllCheckbox = document.getElementById('selectAll');
+const productCheckboxes = document.querySelectorAll('.product-checkbox');
+selectAllCheckbox.addEventListener('change', function() {
+productCheckboxes.forEach(checkbox => {
+checkbox.checked = selectAllCheckbox.checked;
+});
+});
+// Add Product Modal
+const addProductBtn = document.getElementById('addProductBtn');
+const addProductModal = document.getElementById('addProductModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const cancelAddBtn = document.getElementById('cancelAddBtn');
+addProductBtn.addEventListener('click', function() {
+addProductModal.classList.remove('hidden');
+});
+closeModalBtn.addEventListener('click', function() {
+addProductModal.classList.add('hidden');
+});
+cancelAddBtn.addEventListener('click', function() {
+addProductModal.classList.add('hidden');
+});
+// Restock buttons
+const restockBtns = document.querySelectorAll('[title="Restock"]');
+const restockModal = document.getElementById('restockModal');
+const closeRestockModalBtn = document.getElementById('closeRestockModalBtn');
+const cancelRestockBtn = document.getElementById('cancelRestockBtn');
+restockBtns.forEach(btn => {
+btn.addEventListener('click', function() {
+restockModal.classList.remove('hidden');
+});
+});
+closeRestockModalBtn.addEventListener('click', function() {
+restockModal.classList.add('hidden');
+});
+cancelRestockBtn.addEventListener('click', function() {
+restockModal.classList.add('hidden');
+});
+// Close modals when clicking outside
+window.addEventListener('click', function(e) {
+if (e.target === addProductModal || e.target === restockModal) {
+addProductModal.classList.add('hidden');
+restockModal.classList.add('hidden');
+}
+});
+// Form submission (prevent default)
+const addProductForm = document.getElementById('addProductForm');
+addProductForm.addEventListener('submit', function(e) {
+e.preventDefault();
+// Here you would normally process the form data
+addProductModal.classList.add('hidden');
+// You could show a success message or refresh the product list
+});
+// Delete Product Functionality
+const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+const deleteProductName = document.getElementById('deleteProductName');
+const deleteProductSKU = document.getElementById('deleteProductSKU');
+let currentDeleteRow = null;
+// Add click event listeners to all delete buttons
+document.querySelectorAll('[title="Delete"]').forEach(btn => {
+btn.addEventListener('click', function(e) {
+const row = this.closest('tr');
+currentDeleteRow = row;
+// Get product details from the row
+const productNameElement = row.querySelector('td:first-child .text-sm.font-medium');
+const productSKUElement = row.querySelector('td:first-child .text-xs.text-gray-500');
+deleteProductName.textContent = productNameElement.textContent;
+deleteProductSKU.textContent = productSKUElement.textContent;
+deleteConfirmModal.classList.remove('hidden');
+});
+});
+// Close modal handlers
+closeDeleteModalBtn.addEventListener('click', () => {
+deleteConfirmModal.classList.add('hidden');
+currentDeleteRow = null;
+});
+cancelDeleteBtn.addEventListener('click', () => {
+deleteConfirmModal.classList.add('hidden');
+currentDeleteRow = null;
+});
+// Handle delete confirmation
+confirmDeleteBtn.addEventListener('click', () => {
+if (currentDeleteRow) {
+currentDeleteRow.remove();
+currentDeleteRow = null;
+}
+deleteConfirmModal.classList.add('hidden');
+});
+// Close modal when clicking outside
+window.addEventListener('click', function(e) {
+if (e.target === deleteConfirmModal) {
+deleteConfirmModal.classList.add('hidden');
+currentDeleteRow = null;
+}
+});
+});
+</script>
+<!-- Delete Confirmation Modal -->
+<!-- Edit Product Modal -->
+<div id="editProductModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+<div class="fixed inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto">
+<div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+<h3 class="text-lg font-medium text-gray-900">Edit Product</h3>
+<button id="closeEditModalBtn" class="text-gray-400 hover:text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<form id="editProductForm">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="col-span-2">
+<label for="editProductName" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+<input type="text" id="editProductName" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter product name">
+</div>
+<div>
+<label for="editProductCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+<select id="editProductCategory" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+<option value="">Select category</option>
+<option value="electronics">Electronics</option>
+<option value="clothing">Clothing</option>
+<option value="groceries">Groceries</option>
+<option value="beauty">Beauty & Personal Care</option>
+<option value="accessories">Accessories</option>
+</select>
+</div>
+<div>
+<label for="editProductSKU" class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+<input type="text" id="editProductSKU" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter SKU">
+</div>
+<div>
+<label for="editProductPrice" class="block text-sm font-medium text-gray-700 mb-1">Selling Price (KSh)</label>
+<input type="number" id="editProductPrice" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.00">
+</div>
+<div>
+<label for="editProductCost" class="block text-sm font-medium text-gray-700 mb-1">Cost Price (KSh)</label>
+<input type="number" id="editProductCost" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0.00">
+</div>
+<div>
+<label for="editProductStock" class="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
+<input type="number" id="editProductStock" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+</div>
+<div>
+<label for="editProductSupplier" class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+<select id="editProductSupplier" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent pr-8">
+<option value="">Select supplier</option>
+<option value="nairobi-electronics">Nairobi Electronics Ltd</option>
+<option value="mombasa-textiles">Mombasa Textiles</option>
+<option value="nakuru-wholesalers">Nakuru Wholesalers</option>
+<option value="kisumu-distributors">Kisumu Distributors</option>
+</select>
+</div>
+<div class="col-span-2">
+<label for="editProductDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+<textarea id="editProductDescription" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Enter product description"></textarea>
+</div>
+<div class="col-span-2">
+<label class="block text-sm font-medium text-gray-700 mb-1">Stock Alert Levels</label>
+<div class="flex items-center space-x-4">
+<div class="flex items-center">
+<span class="text-sm text-gray-500 mr-2">Low Stock:</span>
+<input type="number" id="editLowStockAlert" class="w-16 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="15">
+</div>
+<div class="flex items-center">
+<span class="text-sm text-gray-500 mr-2">Critical Stock:</span>
+<input type="number" id="editCriticalStockAlert" class="w-16 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="5">
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 flex justify-end space-x-3">
+<button type="button" id="cancelEditBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap">Cancel</button>
+<button type="submit" class="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium !rounded-button whitespace-nowrap">Save Changes</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<div id="deleteConfirmModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+<div class="fixed inset-0 bg-black bg-opacity-50"></div>
+<div class="bg-white rounded-lg shadow-xl w-full max-w-md relative z-10">
+<div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+<h3 class="text-lg font-medium text-gray-900">Delete Product</h3>
+<button id="closeDeleteModalBtn" class="text-gray-400 hover:text-gray-500">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<div class="mb-4">
+<div class="text-gray-700 mb-2">Are you sure you want to delete this product?</div>
+<div id="deleteProductName" class="font-medium text-gray-900"></div>
+<div id="deleteProductSKU" class="text-sm text-gray-500"></div>
+</div>
+<div class="mt-6 flex justify-end space-x-3">
+<button type="button" id="cancelDeleteBtn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 !rounded-button whitespace-nowrap">Cancel</button>
+<button type="button" id="confirmDeleteBtn" class="px-4 py-2 bg-red-500 text-white rounded-md text-sm font-medium hover:bg-red-600 !rounded-button whitespace-nowrap">Delete</button>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
