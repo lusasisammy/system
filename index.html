@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBiz - Business Management System</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#4f46e5',secondary:'#10b981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .custom-checkbox {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+        }
+        .custom-checkbox input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 18px;
+            height: 18px;
+            background-color: #fff;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+        }
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+        .custom-checkbox .checkmark:after {
+            left: 5px;
+            top: 2px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e7eb;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4f46e5;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .custom-range {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            outline: none;
+        }
+        .custom-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #4f46e5;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full">
+        <div class="p-4 border-b border-gray-200 flex items-center">
+            <div class="font-['Pacifico'] text-2xl text-primary">SmartBiz</div>
+        </div>
+        
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i class="ri-user-line text-gray-600"></i>
+                </div>
+                <div>
+                    <div class="font-medium text-sm">James Mwangi</div>
+                    <div class="text-xs text-gray-500">Admin • Nairobi Branch</div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <div class="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-primary bg-indigo-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-dashboard-line"></i>
+                </div>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-store-2-line"></i>
+                </div>
+                <span>Inventory</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-shopping-cart-line"></i>
+                </div>
+                <span>Point of Sale</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-user-3-line"></i>
+                </div>
+                <span>Customers</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-money-dollar-circle-line"></i>
+                </div>
+                <span>Expenses</span>
+            </a>
+            
+            <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Reports</div>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-line-chart-line"></i>
+                </div>
+                <span>Sales Reports</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-pie-chart-line"></i>
+                </div>
+                <span>Financial Reports</span>
+            </a>
+            
+            <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings</div>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-user-settings-line"></i>
+                </div>
+                <span>User Management</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                <div class="w-5 h-5 mr-3 flex items-center justify-center">
+                    <i class="ri-settings-3-line"></i>
+                </div>
+                <span>System Settings</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center text-sm text-gray-500">
+                    <div class="w-5 h-5 flex items-center justify-center mr-2">
+                        <i class="ri-wifi-line"></i>
+                    </div>
+                    <span>Online</span>
+                </div>
+                <div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 flex items-center justify-between px-6 py-3">
+            <div class="flex items-center">
+                <button class="text-gray-600 focus:outline-none lg:hidden">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-menu-line"></i>
+                    </div>
+                </button>
+                <div class="relative mx-4 lg:mx-0 w-64">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <div class="w-5 h-5 flex items-center justify-center text-gray-500">
+                            <i class="ri-search-line"></i>
+                        </div>
+                    </span>
+                    <input class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-md text-sm placeholder-gray-500 focus:outline-none focus:border-primary" type="text" placeholder="Search...">
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button class="flex items-center focus:outline-none">
+                        <div class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700">
+                            <i class="ri-notification-3-line"></i>
+                        </div>
+                        <div class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+                    </button>
+                </div>
+                
+                <div class="relative">
+                    <button class="flex items-center focus:outline-none">
+                        <div class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700">
+                            <i class="ri-question-line"></i>
+                        </div>
+                    </button>
+                </div>
+                
+                <div class="border-l border-gray-200 h-6 mx-2"></div>
+                
+                <div class="relative">
+                    <button class="flex items-center space-x-2 focus:outline-none">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                            <i class="ri-user-line text-gray-600"></i>
+                        </div>
+                        <div class="hidden md:block text-sm font-medium text-gray-700">James</div>
+                        <div class="w-5 h-5 flex items-center justify-center text-gray-500">
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+                <p class="text-sm text-gray-500">Welcome back, James. Here's what's happening with your business today.</p>
+            </div>
+            
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded shadow p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-medium text-gray-500">Today's Sales</h3>
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-primary">
+                            <i class="ri-shopping-bag-line"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-end">
+                        <p class="text-2xl font-bold text-gray-900">KSh 24,580</p>
+                        <span class="ml-2 text-xs font-medium text-green-500 flex items-center">
+                            <i class="ri-arrow-up-s-line"></i> 12%
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Compared to yesterday</p>
+                </div>
+                
+                <div class="bg-white rounded shadow p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-medium text-gray-500">Total Items Sold</h3>
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <i class="ri-bar-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-end">
+                        <p class="text-2xl font-bold text-gray-900">87</p>
+                        <span class="ml-2 text-xs font-medium text-green-500 flex items-center">
+                            <i class="ri-arrow-up-s-line"></i> 8%
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Compared to yesterday</p>
+                </div>
+                
+                <div class="bg-white rounded shadow p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-medium text-gray-500">Expenses</h3>
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                            <i class="ri-money-dollar-circle-line"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-end">
+                        <p class="text-2xl font-bold text-gray-900">KSh 5,240</p>
+                        <span class="ml-2 text-xs font-medium text-red-500 flex items-center">
+                            <i class="ri-arrow-down-s-line"></i> 3%
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Compared to yesterday</p>
+                </div>
+                
+                <div class="bg-white rounded shadow p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-medium text-gray-500">Customer Debts</h3>
+                        <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                            <i class="ri-user-3-line"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-end">
+                        <p class="text-2xl font-bold text-gray-900">KSh 12,800</p>
+                        <span class="ml-2 text-xs font-medium text-red-500 flex items-center">
+                            <i class="ri-arrow-up-s-line"></i> 5%
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Total outstanding amount</p>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded shadow p-5 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium text-gray-700">Sales Performance</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full !rounded-button">Day</button>
+                            <button class="px-3 py-1 text-xs font-medium text-white bg-primary rounded-full !rounded-button">Week</button>
+                            <button class="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full !rounded-button">Month</button>
+                        </div>
+                    </div>
+                    <div id="salesChart" style="width: 100%; height: 300px;"></div>
+                </div>
+                
+                <div class="bg-white rounded shadow p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium text-gray-700">Sales by Category</h3>
+                        <div class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-500">
+                            <i class="ri-more-2-fill"></i>
+                        </div>
+                    </div>
+                    <div id="categoryChart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+            
+            <!-- Stock Alerts & Recent Transactions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded shadow lg:col-span-1">
+                    <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-medium text-gray-700">Low Stock Alerts</h3>
+                        <span class="text-xs font-medium text-white bg-red-500 rounded-full px-2 py-1">4 items</span>
+                    </div>
+                    <div class="p-2">
+                        <div class="p-3 border-b border-gray-100">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-sm font-medium text-gray-800">Samsung Phone Charger</h4>
+                                <span class="text-xs font-medium text-red-500">Critical</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-500">Remaining: 2 units</p>
+                                <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Restock Now</button>
+                            </div>
+                        </div>
+                        <div class="p-3 border-b border-gray-100">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-sm font-medium text-gray-800">Hair Conditioner 250ml</h4>
+                                <span class="text-xs font-medium text-orange-500">Low</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-500">Remaining: 5 units</p>
+                                <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Restock Now</button>
+                            </div>
+                        </div>
+                        <div class="p-3 border-b border-gray-100">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-sm font-medium text-gray-800">Bluetooth Speaker JBL</h4>
+                                <span class="text-xs font-medium text-red-500">Critical</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-500">Remaining: 1 unit</p>
+                                <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Restock Now</button>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-sm font-medium text-gray-800">Men's T-Shirt (L)</h4>
+                                <span class="text-xs font-medium text-orange-500">Low</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-500">Remaining: 4 units</p>
+                                <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Restock Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded shadow lg:col-span-2">
+                    <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-medium text-gray-700">Recent Transactions</h3>
+                        <button class="text-sm text-primary font-medium !rounded-button whitespace-nowrap">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">John Kamau</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">3 items</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">KSh 2,450</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">M-Pesa</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        10:25 AM
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">Mary Wanjiku</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">1 item</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">KSh 850</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Cash</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        10:18 AM
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">David Omondi</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">5 items</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">KSh 4,200</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Credit</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        9:45 AM
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">Sarah Njeri</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-500">2 items</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">KSh 1,750</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">M-Pesa</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        9:32 AM
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Customer Credits & Expense Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded shadow">
+                    <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-medium text-gray-700">Top Customer Credits</h3>
+                        <button class="text-sm text-primary font-medium !rounded-button whitespace-nowrap">View All</button>
+                    </div>
+                    <div class="p-5">
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">David Omondi</span>
+                                    <span class="text-sm font-medium text-gray-700">KSh 12,450</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-xs text-gray-500">Last payment: Apr 15, 2025</span>
+                                    <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Send Reminder</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Beatrice Akinyi</span>
+                                    <span class="text-sm font-medium text-gray-700">KSh 8,200</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 65%"></div>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-xs text-gray-500">Last payment: Apr 20, 2025</span>
+                                    <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Send Reminder</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Joseph Maina</span>
+                                    <span class="text-sm font-medium text-gray-700">KSh 5,800</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-xs text-gray-500">Last payment: Apr 22, 2025</span>
+                                    <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Send Reminder</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-gray-700">Grace Wambui</span>
+                                    <span class="text-sm font-medium text-gray-700">KSh 3,150</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 25%"></div>
+                                </div>
+                                <div class="flex justify-between mt-1">
+                                    <span class="text-xs text-gray-500">Last payment: Apr 23, 2025</span>
+                                    <button class="text-xs text-primary font-medium !rounded-button whitespace-nowrap">Send Reminder</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded shadow">
+                    <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-medium text-gray-700">Expense Breakdown</h3>
+                        <div>
+                            <button class="inline-flex items-center text-sm text-gray-700 font-medium !rounded-button whitespace-nowrap">
+                                <span>This Week</span>
+                                <div class="w-5 h-5 ml-1 flex items-center justify-center">
+                                    <i class="ri-arrow-down-s-line"></i>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div id="expenseChart" style="width: 100%; height: 250px;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sales Performance Chart
+            const salesChart = echarts.init(document.getElementById('salesChart'));
+            const salesOption = {
+                animation: false,
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    textStyle: {
+                        color: '#1f2937'
+                    }
+                },
+                grid: {
+                    top: 10,
+                    right: 10,
+                    bottom: 20,
+                    left: 40
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#e5e7eb'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#6b7280'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        color: '#6b7280'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#e5e7eb'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Sales',
+                        type: 'line',
+                        smooth: true,
+                        data: [5800, 7200, 6500, 9800, 8500, 12000, 9500],
+                        lineStyle: {
+                            color: 'rgba(87, 181, 231, 1)'
+                        },
+                        itemStyle: {
+                            color: 'rgba(87, 181, 231, 1)'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {
+                                    offset: 0,
+                                    color: 'rgba(87, 181, 231, 0.3)'
+                                },
+                                {
+                                    offset: 1,
+                                    color: 'rgba(87, 181, 231, 0.1)'
+                                }
+                            ])
+                        }
+                    }
+                ]
+            };
+            salesChart.setOption(salesOption);
+
+            // Category Chart
+            const categoryChart = echarts.init(document.getElementById('categoryChart'));
+            const categoryOption = {
+                animation: false,
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    textStyle: {
+                        color: '#1f2937'
+                    }
+                },
+                legend: {
+                    bottom: '0%',
+                    left: 'center',
+                    textStyle: {
+                        color: '#6b7280'
+                    }
+                },
+                series: [
+                    {
+                        name: 'Sales by Category',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        center: ['50%', '45%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 8,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '12',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 35, name: 'Electronics', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+                            { value: 25, name: 'Clothing', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+                            { value: 20, name: 'Beauty', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+                            { value: 15, name: 'Groceries', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+                        ]
+                    }
+                ]
+            };
+            categoryChart.setOption(categoryOption);
+
+            // Expense Chart
+            const expenseChart = echarts.init(document.getElementById('expenseChart'));
+            const expenseOption = {
+                animation: false,
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    textStyle: {
+                        color: '#1f2937'
+                    }
+                },
+                legend: {
+                    bottom: '0%',
+                    left: 'center',
+                    textStyle: {
+                        color: '#6b7280'
+                    }
+                },
+                series: [
+                    {
+                        name: 'Expenses',
+                        type: 'pie',
+                        radius: '70%',
+                        center: ['50%', '40%'],
+                        data: [
+                            { value: 2500, name: 'Rent', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+                            { value: 1200, name: 'Utilities', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+                            { value: 800, name: 'Salaries', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+                            { value: 500, name: 'Transport', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            expenseChart.setOption(expenseOption);
+            // Responsive charts
+            window.addEventListener('resize', function() {
+                salesChart.resize();
+                categoryChart.resize();
+                expenseChart.resize();
+            });
+        });
+    </script>
+</body>
+</html>
